@@ -2,6 +2,9 @@
 
 #include <NTL/GF2X.h>
 
+/// @brief A tag used to dispatch calls to functions using a row lookup.
+struct RowLookupTag { };
+
 /// @brief The inverse function over a finite field.
 class Inverse {
 public:
@@ -25,9 +28,17 @@ public:
     /// @brief Computes the differential uniformity of this function.
     auto uniformity() const noexcept -> size_t;
 
+    /// @brief Computes the differential uniformity of this function using a lookup table.
+    auto uniformity(RowLookupTag) const noexcept -> size_t;
+
     /// @brief Computes the maximum number solutions for the difference map, with fixed `a`.
     /// @param a An element in the same field which this function is defined.
     auto row_max_delta(const NTL::GF2X& a) const noexcept -> size_t;
+
+    /// @brief Computes the maximum number solutions for the difference map, with fixed `a`, using a
+    /// lookup table.
+    /// @param a An element in the same field which this function is defined.
+    auto row_max_delta(const NTL::GF2X& a, RowLookupTag) const noexcept -> size_t;
 
     /// @brief Computes the number solutions for the difference map, with fixed `a` and `b`.
     /// @param a An element in the same field which this function is defined.
