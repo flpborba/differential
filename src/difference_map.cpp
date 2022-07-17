@@ -1,6 +1,7 @@
 #include "bf.h"
 #include "difference_map.h"
 #include <tbb/blocked_range.h>
+#include <tbb/concurrent_vector.h>
 #include <tbb/parallel_reduce.h>
 
 auto Inverse::difference_map(const NTL::GF2X& x, const NTL::GF2X& a) const noexcept -> NTL::GF2X
@@ -14,6 +15,12 @@ auto Inverse::uniformity() const noexcept -> size_t
     return row_max_delta(a);
 }
 
+auto Inverse::uniformity(RowLookupTag) const noexcept -> size_t
+{
+    const auto a = make_elem(0x1);
+    return row_max_delta(a, RowLookupTag());
+}
+
 auto Inverse::row_max_delta(const NTL::GF2X& a) const noexcept -> size_t
 {
     const auto range = tbb::blocked_range<uint64_t>(0x1, field_order());
@@ -25,6 +32,30 @@ auto Inverse::row_max_delta(const NTL::GF2X& a) const noexcept -> size_t
 
             val = std::max(val, d);
         }
+
+        return val;
+    };
+
+    return tbb::parallel_reduce(range, size_t(0), body, Max());
+}
+
+auto Inverse::row_max_delta(const NTL::GF2X& a, RowLookupTag) const noexcept -> size_t
+{
+    const auto bit_floor = uint64_t(0x1) << NTL::deg(a);
+    const auto range = tbb::blocked_range<uint64_t>(0x0, bit_floor);
+
+    auto row = tbb::concurrent_vector<size_t>(field_order());
+
+    const auto body = [this, &row, &a, bit_floor](const auto& r, auto val) {
+        const auto bit_ceil = bit_floor << 1;
+
+        for (auto i = uint64_t(0x0); i < field_order(); i += bit_ceil)
+            for (auto j = r.begin(); j < r.end(); ++j) {
+                auto x = make_elem(i ^ j);
+                auto diff = difference_map(x, a);
+
+                val = std::max(val, row[bytes(diff)] += 2);
+            }
 
         return val;
     };
