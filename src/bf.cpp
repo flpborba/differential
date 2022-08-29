@@ -21,6 +21,29 @@ auto Inverse::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
     return (bytes(x) <= 0x1) ? x : NTL::InvMod(x, mod);
 }
 
+Tu::Tu(int field_deg, NTL::GF2X delta)
+    : mod(NTL::BuildSparseIrred_GF2X(field_deg))
+    , d(delta)
+{
+    if (NTL::TraceMod(delta, mod) == NTL::GF2::zero())
+        throw std::invalid_argument("Tr(delta) equals 0");
+}
+
+auto Tu::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
+{
+    auto t = NTL::MulMod(d, x, mod);
+
+    if (NTL::IsZero(NTL::TraceMod(t, mod))) {
+        NTL::SqrMod(t, x, mod);
+        NTL::add(t, t, x);
+    }
+
+    if (!NTL::IsZero(t))
+        NTL::InvMod(t, t, mod);
+
+    return t;
+}
+
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t
 {
     return NTL::IsZero(elem) ? 0x0 : elem.xrep[0];

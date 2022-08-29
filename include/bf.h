@@ -49,6 +49,23 @@ protected:
     NTL::GF2XModulus mod;
 };
 
+/// @brief The function presented in Tu et al. (2018).
+class Tu {
+public:
+    /// @brief Constructs an instance of the Tu function over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    /// @param delta Value of delta used in the function.
+    Tu(int field_deg, NTL::GF2X delta);
+
+    /// @brief Applies this function.
+    /// @param x Point in which to evaluate;
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X;
+
+protected:
+    NTL::GF2XModulus mod;
+    NTL::GF2X d;
+};
+
 /// @brief Returns the bytes representing a polynomial over GF(2)[x].
 /// @param a A polynomial over GF(2)[x].
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;
