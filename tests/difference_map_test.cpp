@@ -36,4 +36,17 @@ TEST_SUITE("binary field")
             CHECK_EQ(Inverse(6).row_max_delta(make_elem(0x3F), RowLookupTag()), 4);
         }
     }
+
+    TEST_CASE("Tu uniformity")
+    {
+        SUBCASE("field degree 4")
+        {
+            CHECK_LE(Tu(4, make_elem(0xA)).uniformity(), 6);
+        }
+
+        SUBCASE("field degree 6")
+        {
+            CHECK_LE(Tu(6, make_elem(0x3E)).uniformity(), 6);
+        }
+    }
 }

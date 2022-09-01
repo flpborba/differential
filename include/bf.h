@@ -5,13 +5,9 @@
 /// @brief A tag used to dispatch calls to functions using a row lookup.
 struct RowLookupTag { };
 
-/// @brief The inverse function over a finite field.
-class Inverse {
+/// @brief Base class for functions over finite fields.
+class Function {
 public:
-    /// @brief Constructs an instance of the inverse function over a finite field.
-    /// @param field_deg Degree of the field modulus.
-    explicit Inverse(int field_deg) noexcept;
-
     /// @brief Returns the degree of the finite field in which the function is defined.
     auto field_degree() const noexcept -> int;
 
@@ -20,16 +16,13 @@ public:
 
     /// @brief Applies the function.
     /// @param x Point in which to evaluate.
-    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X;
+    virtual auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X = 0;
 
     /// @brief Computes the difference map f(x + a) + f(x) of this function.
     auto difference_map(const NTL::GF2X& x, const NTL::GF2X& a) const noexcept -> NTL::GF2X;
 
     /// @brief Computes the differential uniformity of this function.
-    auto uniformity() const noexcept -> size_t;
-
-    /// @brief Computes the differential uniformity of this function using a lookup table.
-    auto uniformity(RowLookupTag) const noexcept -> size_t;
+    virtual auto uniformity() const noexcept -> size_t;
 
     /// @brief Computes the maximum number solutions for the difference map, with fixed `a`.
     /// @param a An element in the same field which this function is defined.
@@ -46,11 +39,34 @@ public:
     auto delta(const NTL::GF2X& a, const NTL::GF2X& b) const noexcept -> size_t;
 
 protected:
+    /// @brief Constructs an instance of the inverse function over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    explicit Function(int field_deg) noexcept;
+
+protected:
     NTL::GF2XModulus mod;
 };
 
+/// @brief The inverse function over a finite field.
+class Inverse : public Function {
+public:
+    /// @brief Constructs an instance of the inverse function over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    explicit Inverse(int field_deg) noexcept;
+
+    /// @brief Applies the function.
+    /// @param x Point in which to evaluate.
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
+
+    /// @brief Computes the differential uniformity of this function.
+    auto uniformity() const noexcept -> size_t override;
+
+    /// @brief Computes the differential uniformity of this function using a lookup table.
+    auto uniformity(RowLookupTag) const noexcept -> size_t;
+};
+
 /// @brief The function presented in Tu et al. (2018).
-class Tu {
+class Tu : public Function {
 public:
     /// @brief Constructs an instance of the Tu function over a finite field.
     /// @param field_deg Degree of the field modulus.
@@ -59,10 +75,9 @@ public:
 
     /// @brief Applies this function.
     /// @param x Point in which to evaluate;
-    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X;
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
 
 protected:
-    NTL::GF2XModulus mod;
     NTL::GF2X d;
 };
 

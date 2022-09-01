@@ -1,19 +1,24 @@
 #include "bf.h"
 #include <NTL/GF2XFactoring.h>
 
-Inverse::Inverse(int field_deg) noexcept
+Function::Function(int field_deg) noexcept
     : mod(NTL::BuildSparseIrred_GF2X(field_deg))
 {
 }
 
-auto Inverse::field_degree() const noexcept -> int
+auto Function::field_degree() const noexcept -> int
 {
     return mod.n;
 }
 
-auto Inverse::field_order() const noexcept -> size_t
+auto Function::field_order() const noexcept -> size_t
 {
     return size_t(1) << field_degree();
+}
+
+Inverse::Inverse(int field_deg) noexcept
+    : Function(field_deg)
+{
 }
 
 auto Inverse::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
@@ -22,7 +27,7 @@ auto Inverse::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
 }
 
 Tu::Tu(int field_deg, NTL::GF2X delta)
-    : mod(NTL::BuildSparseIrred_GF2X(field_deg))
+    : Function(field_deg)
     , d(delta)
 {
     if (NTL::TraceMod(delta, mod) == NTL::GF2::zero())
