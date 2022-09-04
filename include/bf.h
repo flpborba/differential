@@ -24,6 +24,9 @@ public:
     /// @brief Computes the differential uniformity of this function.
     virtual auto uniformity() const noexcept -> size_t;
 
+    /// @brief Computes the differential uniformity of this function using a lookup table.
+    virtual auto uniformity(RowLookupTag) const noexcept -> size_t;
+
     /// @brief Computes the maximum number solutions for the difference map, with fixed `a`.
     /// @param a An element in the same field which this function is defined.
     auto row_max_delta(const NTL::GF2X& a) const noexcept -> size_t;
@@ -62,7 +65,7 @@ public:
     auto uniformity() const noexcept -> size_t override;
 
     /// @brief Computes the differential uniformity of this function using a lookup table.
-    auto uniformity(RowLookupTag) const noexcept -> size_t;
+    auto uniformity(RowLookupTag) const noexcept -> size_t override;
 };
 
 /// @brief The function presented in Tu et al. (2018).

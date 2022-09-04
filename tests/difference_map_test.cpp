@@ -49,4 +49,17 @@ TEST_SUITE("binary field")
             CHECK_LE(Tu(6, make_elem(0x3E)).uniformity(), 6);
         }
     }
+
+    TEST_CASE("Tu uniformity with row lookup table")
+    {
+        SUBCASE("field degree 4")
+        {
+            CHECK_LE(Tu(4, make_elem(0xF)).uniformity(RowLookupTag()), 6);
+        }
+
+        SUBCASE("field degree 6")
+        {
+            CHECK_LE(Tu(6, make_elem(0x32)).uniformity(RowLookupTag()), 6);
+        }
+    }
 }

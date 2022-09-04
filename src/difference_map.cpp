@@ -25,6 +25,22 @@ auto Function::uniformity() const noexcept -> size_t
     return tbb::parallel_reduce(range, size_t(0), body, Max());
 }
 
+auto Function::uniformity(RowLookupTag) const noexcept -> size_t
+{
+    const auto range = tbb::blocked_range<uint64_t>(0x1, field_order());
+
+    const auto body = [this](const auto& r, auto val) {
+        for (auto i = r.begin(); i < r.end(); ++i) {
+            const auto a = make_elem(i);
+            val = std::max(val, row_max_delta(a, RowLookupTag()));
+        }
+
+        return val;
+    };
+
+    return tbb::parallel_reduce(range, size_t(0), body, Max());
+}
+
 auto Function::row_max_delta(const NTL::GF2X& a) const noexcept -> size_t
 {
     const auto range = tbb::blocked_range<uint64_t>(0x1, field_order());
