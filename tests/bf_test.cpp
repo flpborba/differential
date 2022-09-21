@@ -53,4 +53,12 @@ TEST_SUITE("binary field")
             CHECK_EQ(f(make_elem(0xA)), make_elem(0x5));
         }
     }
+
+    TEST_CASE("Cached function")
+    {
+        auto f = Tu(4, make_elem(0xE));
+        auto g = Cached<Tu>(4, make_elem(0xE));
+
+        CHECK_EQ(f(make_elem(0x9)), g(make_elem(0x9)));
+    }
 }

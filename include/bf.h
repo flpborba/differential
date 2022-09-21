@@ -1,6 +1,8 @@
 #pragma once
 
 #include <NTL/GF2X.h>
+#include <mutex>
+#include <vector>
 
 /// @brief A tag used to dispatch calls to functions using a row lookup.
 struct RowLookupTag { };
@@ -84,6 +86,23 @@ protected:
     NTL::GF2X d;
 };
 
+template <typename T>
+class Cached : public T {
+public:
+    /// @brief Constructs a cached instance of a function `T` over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    /// @param args Extra arguments needed to construct function `T`.
+    template <typename... Args>
+    Cached(int field_deg, Args... args) noexcept(noexcept(T(field_deg, args...)));
+
+    /// @brief Applies this function.
+    /// @param x Point in which to evaluate;
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
+
+protected:
+    mutable std::vector<std::pair<std::once_flag, NTL::GF2X>> cache;
+};
+
 /// @brief Returns the bytes representing a polynomial over GF(2)[x].
 /// @param a A polynomial over GF(2)[x].
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;
@@ -92,3 +111,23 @@ auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;
 /// @param bytes Bytes representing of the coefficients with the least significant bit of the
 /// first byte corresponding to the constant term.
 auto make_elem(uint64_t bytes) noexcept -> NTL::GF2X;
+
+template <typename T>
+template <typename... Args>
+Cached<T>::Cached(int field_deg, Args... args) noexcept(noexcept(T(field_deg, args...)))
+    : T(field_deg, args...)
+    , cache(T::field_order())
+{
+}
+
+template <typename T>
+auto Cached<T>::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
+{
+    const auto n = bytes(x);
+
+    std::call_once(cache[n].first, [this, &x, n]() {
+        cache[n].second = T::operator()(x);
+    });
+
+    return cache[n].second;
+}

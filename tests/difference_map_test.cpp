@@ -62,4 +62,10 @@ TEST_SUITE("binary field")
             CHECK_LE(Tu(6, make_elem(0x32)).uniformity(RowLookupTag()), 6);
         }
     }
+
+    TEST_CASE("Cached function uniformity")
+    {
+        CHECK_EQ(Cached<Inverse>(3).uniformity(), 2);
+        CHECK_LE(Cached<Tu>(4, make_elem(0xA)).uniformity(RowLookupTag()), 6);
+    }
 }
