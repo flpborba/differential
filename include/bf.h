@@ -52,6 +52,26 @@ protected:
     NTL::GF2XModulus mod;
 };
 
+/// @brief The Dickson polynomial of the first kind.
+class Dickson : public Function {
+public:
+    /// @brief Constructs a Dickson polynomial of the first kind.
+    /// @param field_deg Degree of the field modulus.
+    /// @param alpha Parameter used to construct the polynomial.
+    Dickson(int field_deg, int deg, NTL::GF2X alpha) noexcept;
+
+    /// @brief Checks whether this function is a permutation.
+    auto is_permutation() const noexcept -> bool;
+
+    /// @brief Applies the function.
+    /// @param x Point in which to evaluate.
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
+
+protected:
+    int deg;
+    std::vector<std::pair<int, NTL::GF2X>> coeffs;
+};
+
 /// @brief The inverse function over a finite field.
 class Inverse : public Function {
 public:

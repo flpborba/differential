@@ -1,5 +1,6 @@
 #include "bf.h"
 #include <NTL/GF2XFactoring.h>
+#include <numeric>
 
 Function::Function(int field_deg) noexcept
     : mod(NTL::BuildSparseIrred_GF2X(field_deg))
@@ -14,6 +15,45 @@ auto Function::field_degree() const noexcept -> int
 auto Function::field_order() const noexcept -> size_t
 {
     return size_t(1) << field_degree();
+}
+
+Dickson::Dickson(int field_deg, int deg, NTL::GF2X alpha) noexcept
+    : Function(field_deg)
+    , deg(deg)
+{
+    for (auto i = 1; i <= deg / 2; ++i) {
+        auto numerator = NTL::ZZ(deg);
+        auto denominator = NTL::ZZ(1);
+
+        for (auto j = 1; j < i; ++j) {
+            numerator *= deg - i - j;
+            denominator *= j + 1;
+        }
+
+        const auto coeff = numerator / denominator;
+
+        if (NTL::bit(coeff, 0) == 1)
+            coeffs.emplace_back(deg - 2 * i, NTL::PowerMod(alpha, i, mod));
+    }
+}
+
+auto Dickson::is_permutation() const noexcept -> bool
+{
+    auto m = 1 << (2 * field_degree());
+    return std::gcd(deg, m - 1) == 1;
+}
+
+auto Dickson::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
+{
+    auto t = NTL::PowerMod(x, deg, mod);
+
+    for (const auto& c : coeffs) {
+        auto z = NTL::PowerMod(x, c.first, mod);
+        const auto term = NTL::MulMod(z, c.second, mod);
+        t += term;
+    }
+
+    return t;
 }
 
 Inverse::Inverse(int field_deg) noexcept
