@@ -2,14 +2,14 @@
 #SBATCH --job-name ddt
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=80
-#SBATCH --time=2:00:00
-#SBATCH --output=inverse_3-10.txt
+#SBATCH --time=24:00:00
+#SBATCH --output=inv_lc_3-32-32.txt
 
 cd $SLURM_SUBMIT_DIR
 
 start_deg=3
-end_deg=5
-repeat=2
+end_deg=32
+repeat=32
 
 rm -rf ./build
 
