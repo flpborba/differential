@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=80
 #SBATCH --time=24:00:00
-#SBATCH --output=inv_lc_3-32-32.txt
+#SBATCH --output=inv_l_3-32-32.txt
 
 cd $SLURM_SUBMIT_DIR
 
