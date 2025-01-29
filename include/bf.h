@@ -48,7 +48,7 @@ protected:
     /// @param field_deg Degree of the field modulus.
     explicit Function(int field_deg) noexcept;
 
-protected:
+public:
     NTL::GF2XModulus mod;
 };
 
@@ -67,7 +67,7 @@ public:
     /// @param x Point in which to evaluate.
     auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
 
-protected:
+    // protected:
     int deg;
     std::vector<std::pair<int, NTL::GF2X>> coeffs;
 };
