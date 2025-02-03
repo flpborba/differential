@@ -24,4 +24,28 @@ TEST_SUITE("binary field")
             CHECK_EQ(make_elem(0x2004), elem);
         }
     }
+
+    TEST_CASE("polynomial evaluation")
+    {
+        SUBCASE("zero polynomial")
+        {
+            const auto p = Polynomial(3, {});
+
+            CHECK_EQ(p(make_elem(0x4)), make_elem(0x0));
+        }
+
+        SUBCASE("constant polynomial")
+        {
+            const auto p = Polynomial(3, { make_elem(0x5) });
+
+            CHECK_EQ(p(make_elem(0x6)), make_elem(0x5));
+        }
+
+        SUBCASE("general case")
+        {
+            const auto p = Polynomial(3, { make_elem(0x7), make_elem(0x0), make_elem(0x2) });
+
+            CHECK_EQ(p(make_elem(0x7)), make_elem(0x1));
+        }
+    }
 }

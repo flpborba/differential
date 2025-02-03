@@ -1,4 +1,32 @@
 #include "bf.h"
+#include <NTL/GF2XFactoring.h>
+#include <numeric>
+
+Function::Function(int field_deg) noexcept
+    : mod(NTL::BuildSparseIrred_GF2X(field_deg))
+{
+}
+
+Polynomial::Polynomial(int field_deg, initializer_list<NTL::GF2X> coeffs) noexcept
+    : Function(field_deg)
+{
+    for (auto it = coeffs.begin(); it != coeffs.end(); ++it)
+        if (!NTL::IsZero(*it))
+            this->coeffs.emplace(it - coeffs.begin(), *it);
+}
+
+auto Polynomial::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
+{
+    auto y = make_elem(0x0);
+
+    for (const auto& [deg, coeff] : coeffs) {
+        auto t = NTL::PowerMod(x, deg, mod);
+        t = NTL::MulMod(coeff, t, mod);
+        y += t;
+    }
+
+    return y;
+}
 
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t
 {
