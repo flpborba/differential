@@ -1,4 +1,5 @@
 #include "bf.h"
+#include "differential.h"
 #include <NTL/GF2XFactoring.h>
 
 Function::Function(size_t field_deg) noexcept
@@ -15,6 +16,21 @@ Polynomial::Polynomial(size_t field_deg, std::initializer_list<NTL::GF2X> coeffs
 
         ++i;
     }
+}
+
+auto Function::field_degree() const noexcept -> size_t
+{
+    return deg(mod);
+}
+
+auto Function::field_order() const noexcept -> size_t
+{
+    return size_t(1) << field_degree();
+}
+
+auto Function::derivative(const NTL::GF2X& x, const NTL::GF2X& a) const noexcept -> NTL::GF2X
+{
+    return operator()(x) + operator()(x + a);
 }
 
 auto Polynomial::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
