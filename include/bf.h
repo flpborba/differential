@@ -11,6 +11,15 @@ protected:
     explicit Function(size_t field_deg) noexcept;
 
 public:
+    /// @brief Returns the degree of the finite field in which the function is defined.
+    auto field_degree() const noexcept -> size_t;
+
+    /// @brief Returns the order of the finite field in which the function is defined.
+    auto field_order() const noexcept -> size_t;
+
+    /// @brief Computes the derivative of this function with respect to `a`.
+    auto derivative(const NTL::GF2X& x, const NTL::GF2X& a) const noexcept -> NTL::GF2X;
+
     /// @brief Applies the function.
     /// @param x Point in which to evaluate.
     virtual auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X = 0;
@@ -28,7 +37,6 @@ public:
     /// constant term.
     explicit Polynomial(size_t field_deg, std::initializer_list<uint64_t> coeffs) noexcept;
 
-public:
     /// @brief Applies the function.
     /// @param x Point in which to evaluate.
     auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;

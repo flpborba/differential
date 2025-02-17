@@ -1,5 +1,6 @@
 add_library(ddt
     bf.cpp
+    differential.cpp
 )
 
 target_include_directories(ddt
@@ -10,4 +11,6 @@ target_include_directories(ddt
 target_link_libraries(ddt
     PUBLIC
         ntl
+        pthread
+        tbb
 )
