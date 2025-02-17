@@ -48,4 +48,21 @@ TEST_SUITE("binary field")
             CHECK_EQ(p(make_elem(0x7)), make_elem(0x1));
         }
     }
+
+    TEST_CASE("power evaluation")
+    {
+        SUBCASE("zero exponent")
+        {
+            const auto p = Power(3, 0);
+
+            CHECK_EQ(p(make_elem(0x4)), make_elem(0x1));
+        }
+
+        SUBCASE("general case")
+        {
+            const auto p = Power(3, 3);
+
+            CHECK_EQ(p(make_elem(0x6)), make_elem(0x7));
+        }
+    }
 }

@@ -39,6 +39,20 @@ protected:
     unordered_map<size_t, NTL::GF2X> coeffs;
 };
 
+/// @brief A power function over a finite field.
+class Power : public Polynomial {
+public:
+    /// @brief Constructs an instance of a power function over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    /// @param exp Exponent.
+    explicit Power(int field_deg, int exp) noexcept;
+
+public:
+    /// @brief Applies the function.
+    /// @param x Point in which to evaluate.
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
+};
+
 /// @brief Returns the bytes representing an element of GF(2)[x].
 /// @param a An element of GF(2)[x].
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;

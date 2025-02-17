@@ -28,6 +28,20 @@ auto Polynomial::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
     return y;
 }
 
+Power::Power(int field_deg, int exp) noexcept
+    : Polynomial(field_deg, {})
+{
+    coeffs.emplace(exp, make_elem(0x0));
+}
+
+auto Power::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
+{
+    auto exp = coeffs.begin()->first;
+    auto y = NTL::PowerMod(x, exp, mod);
+
+    return y;
+}
+
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t
 {
     return NTL::IsZero(elem) ? 0x0 : elem.xrep[0];
