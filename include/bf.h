@@ -45,6 +45,16 @@ protected:
     std::vector<std::pair<size_t, NTL::GF2X>> terms;
 };
 
+/// @brief A polynomial function over a finite field.
+class Monomial : public Polynomial {
+public:
+    /// @brief Constructs an instance of a mononomial function over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    /// @param deg Degree of the monomial.
+    /// @param coeffs Coefficient's bytes.
+    explicit Monomial(size_t field_deg, size_t deg, NTL::GF2X coeff) noexcept;
+};
+
 /// @brief Returns the bytes representing an element of GF(2)[x].
 /// @param elem An element of GF(2)[x].
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;

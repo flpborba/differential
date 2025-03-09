@@ -46,6 +46,13 @@ auto Polynomial::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
     return y;
 }
 
+Monomial::Monomial(size_t field_deg, size_t deg, NTL::GF2X coeff) noexcept
+    : Polynomial(field_deg, { coeff })
+{
+    if (!terms.empty())
+        terms[0].first = deg;
+}
+
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t
 {
     return NTL::IsZero(elem) ? 0x0 : elem.xrep[0];
