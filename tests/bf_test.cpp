@@ -57,4 +57,28 @@ TEST_SUITE("binary field")
             CHECK_EQ(p(x), y);
         }
     }
+
+    TEST_CASE("monomial evaluation")
+    {
+        SUBCASE("zero monomial")
+        {
+            const auto m = Monomial(3, 0, make_elem(0x0));
+
+            CHECK_EQ(m(make_elem(0x4)), make_elem(0x0));
+        }
+
+        SUBCASE("constant monomial")
+        {
+            const auto m = Monomial(3, 1, make_elem(0x5));
+
+            CHECK_EQ(m(make_elem(0x6)), make_elem(0x3));
+        }
+
+        SUBCASE("general case")
+        {
+            const auto m = Monomial(3, 2, make_elem(0x7));
+
+            CHECK_EQ(m(make_elem(0x7)), make_elem(0x2));
+        }
+    }
 }
