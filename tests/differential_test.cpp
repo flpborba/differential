@@ -120,4 +120,43 @@ TEST_SUITE("binary field")
             CHECK_EQ(d.uniformity(), 4);
         }
     }
+
+    TEST_CASE("monomial uniformity")
+    {
+        SUBCASE("zero monomial")
+        {
+            auto m = Monomial(3, -1, 0x0);
+            auto d = Differential(m);
+
+            CHECK_EQ(d.uniformity(), 8);
+        }
+
+        SUBCASE("constant monomial")
+        {
+            auto m = Monomial(5, 0, 0x1);
+            auto d = Differential(m);
+
+            CHECK_EQ(d.uniformity(), 32);
+        }
+
+        SUBCASE("degree 2 monomial")
+        {
+            auto m = Monomial(6, 7, 0x1);
+            auto d = Differential(m);
+
+            CHECK_EQ(d.uniformity(), 6);
+        }
+
+        SUBCASE("uniformity equals max preimage size")
+        {
+            auto m = Monomial(5, 0, 0x1);
+            auto d = Differential(m);
+
+            auto uniformity = d.uniformity();
+
+            CHECK_EQ(d.max_preimage_size(make_elem(0x7)), uniformity);
+            CHECK_EQ(d.max_preimage_size(make_elem(0xB)), uniformity);
+            CHECK_EQ(d.max_preimage_size(make_elem(0xE)), uniformity);
+        }
+    }
 }
