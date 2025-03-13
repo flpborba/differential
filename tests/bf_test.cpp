@@ -72,4 +72,16 @@ TEST_SUITE("binary field")
             CHECK_EQ(m(make_elem(0x7)), make_elem(0x2));
         }
     }
+
+    TEST_CASE("cached function")
+    {
+        const auto c = Cached<Polynomial>(3, { 0x7, 0x4, 0x2 });
+        const auto p = Polynomial(3, { 0x7, 0x4, 0x2 });
+
+        for (auto i = 0; i < 8; ++i) {
+            auto x = make_elem(i);
+
+            CHECK_EQ(c(x), p(x));
+        }
+    }
 }

@@ -55,6 +55,24 @@ public:
     explicit Monomial(size_t field_deg, size_t deg, uint64_t coeff) noexcept;
 };
 
+template <typename T>
+class Cached : public T {
+public:
+    /// @brief Constructs a cached instance of a function `T` over a finite field.
+    /// @param field_deg Degree of the field modulus.
+    /// @param args Extra arguments needed to construct function `T`.
+    template <typename... Arg>
+    Cached(int field_deg, Arg... arg) noexcept(noexcept(T(field_deg, arg...)));
+
+public:
+    /// @brief Applies this function.
+    /// @param x Point in which to evaluate;
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override;
+
+protected:
+    mutable std::vector<std::pair<std::once_flag, NTL::GF2X>> cache;
+};
+
 /// @brief Returns the bytes representing an element of GF(2)[x].
 /// @param elem An element of GF(2)[x].
 auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;
@@ -63,3 +81,23 @@ auto bytes(const NTL::GF2X& elem) noexcept -> uint64_t;
 /// @param coefficients Bytes representing of the coefficients with the least significant bit of the
 /// first byte corresponding to the constant term.
 auto make_elem(uint64_t coefficients) noexcept -> NTL::GF2X;
+
+template <typename T>
+template <typename... Arg>
+Cached<T>::Cached(int field_deg, Arg... arg) noexcept(noexcept(T(field_deg, arg...)))
+    : T(field_deg, arg...)
+    , cache(T::field_order())
+{
+}
+
+template <typename T>
+auto Cached<T>::operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X
+{
+    const auto n = bytes(x);
+
+    std::call_once(cache[n].first, [this, &x, n]() {
+        cache[n].second = T::operator()(x);
+    });
+
+    return cache[n].second;
+}
