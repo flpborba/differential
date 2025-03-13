@@ -5,8 +5,8 @@
 #include <tbb/concurrent_unordered_set.h>
 #include <atomic>
 
-struct FunctionMock : public Function {
-    FunctionMock(size_t field_deg)
+struct FunctionVisitor : public Function {
+    FunctionVisitor(size_t field_deg)
         : Function(field_deg)
     {
     }
@@ -66,7 +66,7 @@ TEST_SUITE("binary field")
 {
     TEST_CASE("input difference iteration")
     {
-        auto v = InputDifferenceCount(FunctionMock(5));
+        auto v = InputDifferenceCount(FunctionVisitor(5));
 
         v.uniformity();
 
@@ -76,7 +76,7 @@ TEST_SUITE("binary field")
 
     TEST_CASE("differential iteration")
     {
-        auto v = DifferentialCount(FunctionMock(5));
+        auto v = DifferentialCount(FunctionVisitor(5));
 
         v.uniformity();
 
@@ -86,7 +86,7 @@ TEST_SUITE("binary field")
 
     TEST_CASE("solution checking iteration")
     {
-        auto v = SolutionCheckingCount(FunctionMock(5));
+        auto v = SolutionCheckingCount(FunctionVisitor(5));
 
         v.uniformity();
 
