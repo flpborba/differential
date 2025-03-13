@@ -1,6 +1,22 @@
 #include "bf.h"
 #include <doctest/doctest.h>
 
+struct FunctionVisitor : public Function {
+    FunctionVisitor(size_t field_deg)
+        : Function(field_deg)
+    {
+    }
+
+    auto operator()(const NTL::GF2X& x) const noexcept -> NTL::GF2X override
+    {
+        ++visits;
+
+        return NTL::GF2X();
+    }
+
+    mutable std::atomic<size_t> visits;
+};
+
 TEST_SUITE("binary field")
 {
     TEST_CASE("element construction")
@@ -79,6 +95,37 @@ TEST_SUITE("binary field")
             const auto m = Monomial(3, 2, make_elem(0x7));
 
             CHECK_EQ(m(make_elem(0x7)), make_elem(0x2));
+        }
+    }
+
+    TEST_CASE("cached function")
+    {
+        SUBCASE("evaluation")
+        {
+            const auto coeffs = { make_elem(0x7), make_elem(0x4), make_elem(0x2) };
+
+            const auto c = Cached<Polynomial>(3, coeffs);
+            const auto p = Polynomial(3, coeffs);
+
+            for (auto i = 0; i < 8; ++i) {
+                const auto x = make_elem(i);
+
+                CHECK_EQ(c(x), p(x));
+            }
+        }
+
+        SUBCASE("number of calls to operator()")
+        {
+            const auto c = Cached<FunctionVisitor>(3);
+            const auto x = make_elem(0x3);
+
+            CHECK_EQ(c.visits, 0);
+
+            for (auto i = 0; i < 5; ++i) {
+                c(x);
+
+                CHECK_EQ(c.visits, 1);
+            }
         }
     }
 }
